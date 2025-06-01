@@ -1,5 +1,5 @@
 {
-  "name": "pronin/webauthn-emulator",
+  "name": "warpr/webauthn-emulator",
   "version": "1.1.0",
   "type": "library",
   "description": "PHP library to emulate WebAuthn authenticators like YubiKeys, Touch ID, Face ID, Windows Hello, etc",
@@ -18,5 +18,8 @@
   "minimum-stability": "stable",
   "require-dev": {
     "guzzlehttp/guzzle": "^7.4"
+  },
+  "scripts": {
+    "post-install-cmd": "git config --local core.hooksPath etc/hooks"
   }
 }

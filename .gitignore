@@ -1,7 +1,7 @@
-vendor/
-.idea
-composer.lock
-tmp/
-*.sh
-cookies.json
-key_storage.txt
+*~
+.DS_Store
+.\#*
+\#*\#
+/node_modules/
+/vendor/
+/.phpunit.cache/
