@@ -24,7 +24,8 @@ echo "Username: $username\n";
 echo "UID: $uid\n";
 
 // Registration step 1 (request challenge from server)
-$registrationInitUrl = 'https://webauthn.lubu.ch/_test/server.php?fn=getCreateArgs&apple=0&yubico=0&solo=0&hypersecu=0&google=0&microsoft=0&mds=0&requireResidentKey=0&type_usb=1&type_nfc=1&type_ble=1&type_int=1&type_hybrid=1&fmt_android-key=0&fmt_android-safetynet=0&fmt_apple=0&fmt_fido-u2f=0&fmt_none=1&fmt_packed=0&fmt_tpm=0';
+$registrationInitUrl =
+    'https://webauthn.lubu.ch/_test/server.php?fn=getCreateArgs&apple=0&yubico=0&solo=0&hypersecu=0&google=0&microsoft=0&mds=0&requireResidentKey=0&type_usb=1&type_nfc=1&type_ble=1&type_int=1&type_hybrid=1&fmt_android-key=0&fmt_android-safetynet=0&fmt_apple=0&fmt_fido-u2f=0&fmt_none=1&fmt_packed=0&fmt_tpm=0';
 $registrationInitRequest = [
     'rpId' => 'webauthn.lubu.ch',
     'userId' => $uid,
@@ -36,7 +37,9 @@ $registrationInitResponse = $httpClient
     ->get($registrationInitUrl . '&' . http_build_query($registrationInitRequest))
     ->getBody()
     ->getContents();
-echo "\n\nregistrationInitResponse\n" . json_encode(json_decode($registrationInitResponse), JSON_PRETTY_PRINT) . "\n\n";
+echo "\n\nregistrationInitResponse\n" .
+    json_encode(json_decode($registrationInitResponse), JSON_PRETTY_PRINT) .
+    "\n\n";
 $registrationInitResponse = json_decode($registrationInitResponse, true);
 
 /* Example response from webauthn.lubu.ch:
@@ -100,9 +103,9 @@ echo "\n\nattestation\n" . json_encode($attestation, JSON_PRETTY_PRINT) . "\n\n"
 }
 */
 
-
 // Registration step 2 (send attestation to server)
-$registrationFinishUrl = 'https://webauthn.lubu.ch/_test/server.php?fn=processCreate&apple=0&yubico=0&solo=0&hypersecu=0&google=0&microsoft=0&mds=0&requireResidentKey=0&type_usb=1&type_nfc=1&type_ble=1&type_int=1&type_hybrid=1&fmt_android-key=0&fmt_android-safetynet=0&fmt_apple=0&fmt_fido-u2f=0&fmt_none=1&fmt_packed=0&fmt_tpm=0';
+$registrationFinishUrl =
+    'https://webauthn.lubu.ch/_test/server.php?fn=processCreate&apple=0&yubico=0&solo=0&hypersecu=0&google=0&microsoft=0&mds=0&requireResidentKey=0&type_usb=1&type_nfc=1&type_ble=1&type_int=1&type_hybrid=1&fmt_android-key=0&fmt_android-safetynet=0&fmt_apple=0&fmt_fido-u2f=0&fmt_none=1&fmt_packed=0&fmt_tpm=0';
 $registrationFinishRequest = [
     'rpId' => 'webauthn.lubu.ch',
     'userId' => $uid,
@@ -111,10 +114,14 @@ $registrationFinishRequest = [
     'userVerification' => 'discouraged',
 ];
 $registrationFinishResponse = $httpClient
-    ->post($registrationFinishUrl . '&' . http_build_query($registrationFinishRequest), ['json' => $attestation['response']])
+    ->post($registrationFinishUrl . '&' . http_build_query($registrationFinishRequest), [
+        'json' => $attestation['response'],
+    ])
     ->getBody()
     ->getContents();
-echo "\n\nregistrationFinishResponse\n" . json_encode(json_decode($registrationFinishResponse), JSON_PRETTY_PRINT) . "\n\n";
+echo "\n\nregistrationFinishResponse\n" .
+    json_encode(json_decode($registrationFinishResponse), JSON_PRETTY_PRINT) .
+    "\n\n";
 $registrationFinishResponse = json_decode($registrationFinishResponse, true);
 
 /* Example response:

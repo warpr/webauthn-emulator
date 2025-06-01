@@ -14,33 +14,39 @@ use WebauthnEmulator\Exceptions\InvalidArgumentException;
 
 class Authenticator implements AuthenticatorInterface
 {
-    public function __construct(
-        protected RepositoryInterface $repository
-    )
+    public function __construct(protected RepositoryInterface $repository)
     {
     }
 
     /**
      * @throws JsonException
      */
-    #[ArrayShape([
-        'id' => "string",
-        'rawId' => "string",
-        'response' => [
-            'clientDataJSON' => "string",
-            'attestationObject' => "string"
-        ],
-        'type' => "string"
-    ])]
-    public function getAttestation(array $registerOptions, ?string $origin = null, array $extra = []): array
-    {
+    #[
+        ArrayShape([
+            'id' => 'string',
+            'rawId' => 'string',
+            'response' => [
+                'clientDataJSON' => 'string',
+                'attestationObject' => 'string',
+            ],
+            'type' => 'string',
+        ])
+    ]
+    public function getAttestation(
+        array $registerOptions,
+        ?string $origin = null,
+        array $extra = []
+    ): array {
         $credential = $this->createCredential($registerOptions);
 
-        $clientDataJson = json_encode([
+        $clientDataJson = json_encode(
+            [
                 'type' => 'webauthn.create',
                 'challenge' => $registerOptions['challenge'],
                 'origin' => $origin ?? 'https://' . $credential->getRpId(),
-            ] + $extra, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
+            ] + $extra,
+            JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES
+        );
 
         $attestationObject = new MapObject([
             'fmt' => new MapItem(new TextStringObject('fmt'), new TextStringObject('none')),
@@ -56,7 +62,7 @@ class Authenticator implements AuthenticatorInterface
             'rawId' => $credential->getId(),
             'response' => [
                 'clientDataJSON' => base64_encode($clientDataJson),
-                'attestationObject' => base64_encode((string)$attestationObject),
+                'attestationObject' => base64_encode((string) $attestationObject),
             ],
             'type' => 'public-key',
         ];
@@ -65,23 +71,49 @@ class Authenticator implements AuthenticatorInterface
     /**
      * @throws JsonException
      */
-    #[ArrayShape(['id' => "string", 'rawId' => "string", 'response' => ['authenticatorData' => "string", 'clientDataJSON' => "string", 'signature' => "string", 'userHandle' => "string"], 'type' => "string"])]
-    public function getAssertion(string $rpId, string|array|null $credentialIds, string $challenge, ?string $origin = null, array $extra = []): array
-    {
+    #[
+        ArrayShape([
+            'id' => 'string',
+            'rawId' => 'string',
+            'response' => [
+                'authenticatorData' => 'string',
+                'clientDataJSON' => 'string',
+                'signature' => 'string',
+                'userHandle' => 'string',
+            ],
+            'type' => 'string',
+        ])
+    ]
+    public function getAssertion(
+        string $rpId,
+        string|array|null $credentialIds,
+        string $challenge,
+        ?string $origin = null,
+        array $extra = []
+    ): array {
         $credential = $this->getCredential($rpId, $credentialIds);
 
         // prepare signature
-        $clientDataJson = json_encode([
-            'type' => 'webauthn.get',
-            'challenge' => $challenge,
-            'origin' => $origin ?? 'https://' . $credential->getRpId(),
-        ], JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
+        $clientDataJson = json_encode(
+            [
+                'type' => 'webauthn.get',
+                'challenge' => $challenge,
+                'origin' => $origin ?? 'https://' . $credential->getRpId(),
+            ],
+            JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES
+        );
         $clientDataHash = hash('sha256', $clientDataJson, true);
 
         $flags = pack('C', 1);
-        $authenticatorData = $credential->getRpIdHash() . $flags . $credential->getPackedSignCount();
+        $authenticatorData =
+            $credential->getRpIdHash() . $flags . $credential->getPackedSignCount();
 
-        openssl_sign($authenticatorData . $clientDataHash, $signature, $credential->privateKey, OPENSSL_ALGO_SHA256);
+        openssl_sign(
+            $authenticatorData . $clientDataHash,
+            $signature,
+            $credential->privateKey,
+            OPENSSL_ALGO_SHA256
+        );
 
         $credential->incrementSignCount();
         $this->repository->save($credential);
@@ -107,13 +139,17 @@ class Authenticator implements AuthenticatorInterface
         return $credential;
     }
 
-    protected function getCredential(string $rpId, string|array|null $credentialIds): CredentialInterface
-    {
+    protected function getCredential(
+        string $rpId,
+        string|array|null $credentialIds
+    ): CredentialInterface {
         if (is_string($credentialIds)) {
-            $credentialIds = [[
-                'id' => $credentialIds,
-                'type' => 'public-key',
-            ]];
+            $credentialIds = [
+                [
+                    'id' => $credentialIds,
+                    'type' => 'public-key',
+                ],
+            ];
         }
 
         if (is_array($credentialIds)) {
@@ -142,7 +178,7 @@ class Authenticator implements AuthenticatorInterface
 
     protected function getAuthData(Credential $credential): string
     {
-        $flags = pack('C', 65);  // attested_data + user_present
+        $flags = pack('C', 65); // attested_data + user_present
         $aaGuid = "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00";
 
         $authData = $credential->getRpIdHash();
@@ -167,7 +203,10 @@ class Authenticator implements AuthenticatorInterface
         }
 
         // if string has chars other than base64, return as is
-        $found = strspn($base64Encoded, 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=');
+        $found = strspn(
+            $base64Encoded,
+            'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/='
+        );
         if ($found !== strlen($base64Encoded)) {
             return $base64Encoded;
         }
@@ -192,7 +231,10 @@ class Authenticator implements AuthenticatorInterface
         }
 
         // if string has chars other than base64url, return as is
-        $found = strspn($base64urlEncoded, 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_');
+        $found = strspn(
+            $base64urlEncoded,
+            'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_'
+        );
         if ($found !== strlen($base64urlEncoded)) {
             return $base64urlEncoded;
         }

@@ -13,12 +13,14 @@ class FileRepository implements RepositoryInterface
 {
     protected array $credentials = [];
 
-    public function __construct(
-        private string $storagePath
-    )
+    public function __construct(private string $storagePath)
     {
         $storageDir = dirname($this->storagePath);
-        if (!file_exists($storageDir) && !mkdir(directory: $storageDir, recursive: true) && !is_dir($storageDir)) {
+        if (
+            !file_exists($storageDir) &&
+            !mkdir(directory: $storageDir, recursive: true) &&
+            !is_dir($storageDir)
+        ) {
             throw new RuntimeException(sprintf('Directory "%s" was not created', $storageDir));
         }
         if (!file_exists($this->storagePath)) {
@@ -27,7 +29,7 @@ class FileRepository implements RepositoryInterface
 
         $storageContent = file_get_contents($this->storagePath);
         if (!empty($storageContent)) {
-            $this->credentials = unserialize($storageContent, ["allowed_classes" => true]);
+            $this->credentials = unserialize($storageContent, ['allowed_classes' => true]);
         }
     }
 

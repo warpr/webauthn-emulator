@@ -23,7 +23,9 @@ $registrationInitResponse = $httpClient
     ->post($registrationInitUrl, ['json' => $registrationInitRequest])
     ->getBody()
     ->getContents();
-echo "\n\nregistrationInitResponse\n" . json_encode(json_decode($registrationInitResponse), JSON_PRETTY_PRINT) . "\n\n";
+echo "\n\nregistrationInitResponse\n" .
+    json_encode(json_decode($registrationInitResponse), JSON_PRETTY_PRINT) .
+    "\n\n";
 $registrationInitResponse = json_decode($registrationInitResponse, true);
 
 /* Example response from Yubico demo server:
@@ -102,7 +104,6 @@ echo "\n\nattestation\n" . json_encode($attestation, JSON_PRETTY_PRINT) . "\n\n"
 
 */
 
-
 // Registration step 2 (send attestation to server)
 $registrationFinishUrl = 'https://demo.yubico.com/api/v1/simple/webauthn/register-finish';
 $registrationFinishRequest = [
@@ -115,14 +116,16 @@ $registrationFinishRequest = [
         ],
         'clientDataJSON' => [
             '$base64' => $attestation['response']['clientDataJSON'],
-        ]
+        ],
     ],
 ];
 $registrationFinishResponse = $httpClient
     ->post($registrationFinishUrl, ['json' => $registrationFinishRequest])
     ->getBody()
     ->getContents();
-echo "\n\nregistrationFinishResponse\n" . json_encode(json_decode($registrationFinishResponse), JSON_PRETTY_PRINT) . "\n\n";
+echo "\n\nregistrationFinishResponse\n" .
+    json_encode(json_decode($registrationFinishResponse), JSON_PRETTY_PRINT) .
+    "\n\n";
 $registrationFinishResponse = json_decode($registrationFinishResponse, true);
 
 /* Example response:

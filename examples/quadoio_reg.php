@@ -33,7 +33,6 @@ $httpClient = new Client([
     ],
 ]);
 
-
 // Registration step 1 (request challenge from server)
 $registrationInitUrl = 'https://api.quado.io/webauthn/api/v1/registrations';
 $registrationInitRequest = [
@@ -55,7 +54,9 @@ $registrationInitResponse = $httpClient
     ->post($registrationInitUrl, ['json' => $registrationInitRequest])
     ->getBody()
     ->getContents();
-echo "\n\nregistrationInitResponse\n" . json_encode(json_decode($registrationInitResponse), JSON_PRETTY_PRINT) . "\n\n";
+echo "\n\nregistrationInitResponse\n" .
+    json_encode(json_decode($registrationInitResponse), JSON_PRETTY_PRINT) .
+    "\n\n";
 $registrationInitResponse = json_decode($registrationInitResponse, true);
 
 /* Example response from quado.io:
@@ -135,7 +136,8 @@ $attestation = $authenticator->getAttestation(
     origin: 'https://demo.quado.io',
     extra: [
         'crossOrigin' => false,
-        'other_keys_can_be_added_here' => 'do not compare clientDataJSON against a template. See https://goo.gl/yabPex',
+        'other_keys_can_be_added_here' =>
+            'do not compare clientDataJSON against a template. See https://goo.gl/yabPex',
     ]
 );
 echo "\n\nattestation\n" . json_encode($attestation, JSON_PRETTY_PRINT) . "\n\n";
@@ -154,7 +156,6 @@ echo "\n\nattestation\n" . json_encode($attestation, JSON_PRETTY_PRINT) . "\n\n"
 
 */
 
-
 // Registration step 2 (send attestation to server)
 $registrationFinishUrl = 'https://api.quado.io/webauthn/api/v1/registrations';
 $registrationFinishRequest = [
@@ -165,7 +166,9 @@ $registrationFinishResponse = $httpClient
     ->patch($registrationFinishUrl, ['json' => $registrationFinishRequest])
     ->getBody()
     ->getContents();
-echo "\n\nregistrationFinishResponse\n" . json_encode(json_decode($registrationFinishResponse), JSON_PRETTY_PRINT) . "\n\n";
+echo "\n\nregistrationFinishResponse\n" .
+    json_encode(json_decode($registrationFinishResponse), JSON_PRETTY_PRINT) .
+    "\n\n";
 $registrationFinishResponse = json_decode($registrationFinishResponse, true);
 
 /* Example response:

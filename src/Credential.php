@@ -41,7 +41,7 @@ class Credential implements CredentialInterface
         $keyDetails = openssl_pkey_get_details($this->privateKey);
 
         // RFC 8152
-        return (string)MapObject::create([
+        return (string) MapObject::create([
             MapItem::create(
                 UnsignedIntegerObject::create(1), // kty (Identification of the key type)
                 UnsignedIntegerObject::create(2) // EC2 (Elliptic Curve Keys w/ x- and y-coordinate pair)
@@ -52,7 +52,7 @@ class Credential implements CredentialInterface
             ),
             MapItem::create(
                 NegativeIntegerObject::create(-1), // crv (EC identifier - Taken from the "COSE Elliptic Curves" registry)
-                UnsignedIntegerObject::create(1)  // P-256 (NIST P-256 also known as secp256r1)
+                UnsignedIntegerObject::create(1) // P-256 (NIST P-256 also known as secp256r1)
             ),
             MapItem::create(
                 NegativeIntegerObject::create(-2), // x-coordinate
@@ -90,13 +90,15 @@ class Credential implements CredentialInterface
         return $this->id;
     }
 
-    #[ArrayShape([
-        'id' => "string",
-        'privateKey' => "string",
-        'rpId' => "string",
-        'userHandle' => "string",
-        'signCount' => "int"
-    ])]
+    #[
+        ArrayShape([
+            'id' => 'string',
+            'privateKey' => 'string',
+            'rpId' => 'string',
+            'userHandle' => 'string',
+            'signCount' => 'int',
+        ])
+    ]
     public function toArray(): array
     {
         openssl_pkey_export($this->privateKey, $privateKey);
@@ -124,7 +126,7 @@ class Credential implements CredentialInterface
             privateKey: openssl_pkey_get_private($credentialData['privateKey']),
             rpId: $credentialData['rpId'],
             userHandle: $credentialData['userHandle'],
-            signCount: $credentialData['signCount'],
+            signCount: $credentialData['signCount']
         );
     }
 

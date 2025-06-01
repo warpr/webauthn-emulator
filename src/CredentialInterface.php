@@ -17,13 +17,15 @@ interface CredentialInterface
     public function getPackedIdLength(): string;
     public function getId(): string;
     public function getUserHandle(): string;
-    #[ArrayShape([
-        'id' => "string",
-        'privateKey' => "string",
-        'rpId' => "string",
-        'userHandle' => "string",
-        'signCount' => "int"
-    ])]
+    #[
+        ArrayShape([
+            'id' => 'string',
+            'privateKey' => 'string',
+            'rpId' => 'string',
+            'userHandle' => 'string',
+            'signCount' => 'int',
+        ])
+    ]
     public function toArray(): array;
     public static function fromArray(array $credentialData): static;
     public function incrementSignCount(): static;

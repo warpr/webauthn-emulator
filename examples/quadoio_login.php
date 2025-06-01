@@ -47,7 +47,9 @@ $authenticationInitResponse = $httpClient
     ->post($authenticationInitUrl, ['json' => $authenticationInitRequest])
     ->getBody()
     ->getContents();
-echo "\n\nauthenticationInitResponse\n" . json_encode(json_decode($authenticationInitResponse), JSON_PRETTY_PRINT) . "\n\n";
+echo "\n\nauthenticationInitResponse\n" .
+    json_encode(json_decode($authenticationInitResponse), JSON_PRETTY_PRINT) .
+    "\n\n";
 $authenticationInitResponse = json_decode($authenticationInitResponse, true);
 
 /* Example response:
@@ -71,7 +73,6 @@ $authenticationInitResponse = json_decode($authenticationInitResponse, true);
 }
 */
 
-
 // Generate assertion
 $assertion = $authenticator->getAssertion(
     rpId: $authenticationInitResponse['fido_request']['rpId'],
@@ -79,7 +80,7 @@ $assertion = $authenticator->getAssertion(
     challenge: $authenticationInitResponse['fido_request']['challenge'],
     origin: 'https://demo.quado.io',
     extra: [
-        'crossOrigin' => false
+        'crossOrigin' => false,
     ]
 );
 echo "\n\nassertion\n" . json_encode($assertion, JSON_PRETTY_PRINT) . "\n\n";
@@ -98,7 +99,6 @@ echo "\n\nassertion\n" . json_encode($assertion, JSON_PRETTY_PRINT) . "\n\n";
 }
 */
 
-
 // Login step 2 (send attestation to server)
 $loginFinishUrl = 'https://api.quado.io/webauthn/api/v1/authentications';
 
@@ -110,7 +110,9 @@ $loginFinishResponse = $httpClient
     ->patch($loginFinishUrl, ['json' => $loginFinishRequest])
     ->getBody()
     ->getContents();
-echo "\n\nloginFinishResponse\n" . json_encode(json_decode($loginFinishResponse), JSON_PRETTY_PRINT) . "\n\n";
+echo "\n\nloginFinishResponse\n" .
+    json_encode(json_decode($loginFinishResponse), JSON_PRETTY_PRINT) .
+    "\n\n";
 $loginFinishResponse = json_decode($loginFinishResponse, true);
 
 /* Example response:

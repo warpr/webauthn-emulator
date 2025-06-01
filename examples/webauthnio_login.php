@@ -33,7 +33,9 @@ $authenticationInitResponse = $httpClient
     ->post($authenticationInitUrl, ['json' => $authenticationInitRequest])
     ->getBody()
     ->getContents();
-echo "\n\nauthenticationInitResponse\n" . json_encode(json_decode($authenticationInitResponse), JSON_PRETTY_PRINT) . "\n\n";
+echo "\n\nauthenticationInitResponse\n" .
+    json_encode(json_decode($authenticationInitResponse), JSON_PRETTY_PRINT) .
+    "\n\n";
 $authenticationInitResponse = json_decode($authenticationInitResponse, true);
 
 /* Example response from webauthn.io:
@@ -57,7 +59,6 @@ $authenticationInitResponse = json_decode($authenticationInitResponse, true);
 }
 */
 
-
 // Generate assertion
 $assertion = $authenticator->getAssertion(
     $authenticationInitResponse['rpId'],
@@ -80,7 +81,6 @@ echo "\n\nassertion\n" . json_encode($assertion, JSON_PRETTY_PRINT) . "\n\n";
 }
 */
 
-
 // Login step 2 (send attestation to server)
 $loginFinishUrl = 'https://webauthn.io/authentication/verification';
 $loginFinishRequest = [
@@ -91,7 +91,9 @@ $loginFinishResponse = $httpClient
     ->post($loginFinishUrl, ['json' => $loginFinishRequest])
     ->getBody()
     ->getContents();
-echo "\n\nloginFinishResponse\n" . json_encode(json_decode($loginFinishResponse), JSON_PRETTY_PRINT) . "\n\n";
+echo "\n\nloginFinishResponse\n" .
+    json_encode(json_decode($loginFinishResponse), JSON_PRETTY_PRINT) .
+    "\n\n";
 $loginFinishResponse = json_decode($loginFinishResponse, true);
 
 /* Example response:
@@ -101,5 +103,5 @@ $loginFinishResponse = json_decode($loginFinishResponse, true);
  */
 
 if ($loginFinishResponse['verified'] === true) {
-    echo"User $username logged in successfully\n";
+    echo "User $username logged in successfully\n";
 }

@@ -23,7 +23,9 @@ $authenticationInitResponse = $httpClient
     ->post($authenticationInitUrl, ['json' => $authenticationInitRequest])
     ->getBody()
     ->getContents();
-echo "\n\nauthenticationInitResponse\n" . json_encode(json_decode($authenticationInitResponse), JSON_PRETTY_PRINT) . "\n\n";
+echo "\n\nauthenticationInitResponse\n" .
+    json_encode(json_decode($authenticationInitResponse), JSON_PRETTY_PRINT) .
+    "\n\n";
 $authenticationInitResponse = json_decode($authenticationInitResponse, true);
 
 /* Example response from Yubico demo server:
@@ -65,7 +67,7 @@ foreach ($allowCredentials as &$allowCredential) {
 $assertion = $authenticator->getAssertion(
     $authenticationInitResponse['data']['publicKey']['rpId'],
     $allowCredentials,
-    $authenticationInitResponse['data']['publicKey']['challenge']['$base64'],
+    $authenticationInitResponse['data']['publicKey']['challenge']['$base64']
 );
 echo "\n\nassertion\n" . json_encode($assertion, JSON_PRETTY_PRINT) . "\n\n";
 
@@ -83,31 +85,32 @@ echo "\n\nassertion\n" . json_encode($assertion, JSON_PRETTY_PRINT) . "\n\n";
 }
 */
 
-
 // Login step 2 (send attestation to server)
 $loginFinishUrl = 'https://demo.yubico.com/api/v1/simple/webauthn/authenticate-finish';
 $loginFinishRequest = [
     'requestId' => $requestId,
     'assertion' => [
         'credentialId' => [
-            '$base64' => $assertion['rawId']
+            '$base64' => $assertion['rawId'],
         ],
         'authenticatorData' => [
-            '$base64' => $assertion['response']['authenticatorData']
+            '$base64' => $assertion['response']['authenticatorData'],
         ],
         'clientDataJSON' => [
-            '$base64' => $assertion['response']['clientDataJSON']
+            '$base64' => $assertion['response']['clientDataJSON'],
         ],
         'signature' => [
-            '$base64' => $assertion['response']['signature']
-        ]
-    ]
+            '$base64' => $assertion['response']['signature'],
+        ],
+    ],
 ];
 $loginFinishResponse = $httpClient
     ->post($loginFinishUrl, ['json' => $loginFinishRequest])
     ->getBody()
     ->getContents();
-echo "\n\nloginFinishResponse\n" . json_encode(json_decode($loginFinishResponse), JSON_PRETTY_PRINT) . "\n\n";
+echo "\n\nloginFinishResponse\n" .
+    json_encode(json_decode($loginFinishResponse), JSON_PRETTY_PRINT) .
+    "\n\n";
 $loginFinishResponse = json_decode($loginFinishResponse, true);
 
 /* Example response:
