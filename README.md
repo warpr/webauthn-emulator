@@ -15,7 +15,6 @@ allowing the developers to integrate WebAuthn client-side authentication into th
     - [Initialization](#initialization)
     - [Registration (Attestation)](#registration-attestation)
     - [Authentication (Assertion)](#authentication-assertion)
-    - [Base64url vs Base64 Encoding](#base64url-vs-base64-encoding)
 - [More Examples](#more-examples)
 - [Storing Credentials](#storing-credentials)
 - [Limitations](#limitations)
@@ -207,8 +206,7 @@ browser's [navigator.credentials.get()](https://developer.mozilla.org/en-US/docs
 - `credentialIds` (string|array|null, optional): A single credential ID, an array of credential descriptors, or null.
   It identifies which credentials are eligible for authentication. If null or omitted, any available credential for
   the `rpId` may be used.
-- `challenge` (string, required): A base64 or base64url encoded challenge from the relying party to prevent replay
-  attacks.
+- `challenge` (string, required): A base64url encoded challenge from the relying party to prevent replay attacks.
 - `origin` (string, optional): The origin of the relying party's website. It defaults to an origin constructed from
   the `rpId` if omitted.
 - `extra` (array, optional): Additional data to include in the `clientDataJSON` object. If omitted, only `type`, `origin`,
@@ -250,80 +248,6 @@ echo(json_encode($assertion, JSON_PRETTY_PRINT));
 */
 
 ```
-
-### Base64url vs Base64 Encoding
-
-WebAuthn servers often use base64url encoding to represent binary data in a URL-safe format. This encoding is similar to
-standard base64 but uses different characters for padding and to represent the 62nd and 63rd values in the index table.
-Specifically, base64url encoding replaces `+` with `-`, `/` with `_`, and omits the padding character `=`. This makes it
-suitable for use in URLs and filenames without requiring additional encoding.
-
-Different WebAuthn server implementations vary in their use of base64url encoding. Some use base64url-encoded
-strings for 'id' or 'challenge' fields, while others use standard base64 encoding or a mix of both. This lack of
-consistency puts the burden to figure out which encoding is used by a particular server and to convert the data
-accordingly on the developer.
-
-The `webauthn-emulator` library provides two utility methods to handle these encoding variations:
-
-- `base64Normal2Url`: Converts standard base64-encoded strings or arrays to base64url encoding. This method is useful
-  when you need to send data to a server that expects base64url-encoded strings.
-
-- `base64Url2Normal`: Converts base64url-encoded strings or arrays back to standard base64 encoding with padding. This
-  method is helpful when you receive data from a server that uses base64url encoding, before feeding it to the emulator.
-
-These methods can be applied recursively to arrays, making it easy to encode or decode all elements within an array.
-
-#### Usage of Base64url Encoding/Decoding Methods
-
-When interacting with a WebAuthn server, you may need to encode or decode the 'id', 'challenge', or other binary data
-fields. Here's how you can use the provided methods:
-
-With single strings:
-
-```php
-use WebauthnEmulator\Authenticator;
-
-// Example of recoding a standard base64 string to base64url
-echo Authenticator::base64Normal2Url('wib1OPW9EkDeiwUoyTgJ1+PpFG4dljeXodqRX15DG+gBAAAABQ=='); 
-// Output: wib1OPW9EkDeiwUoyTgJ1-PpFG4dljeXodqRX15DG-gBAAAABQ
-
-// Example of recoding a base64url string to standard base64
-echo Authenticator::base64Url2Normal('wib1OPW9EkDeiwUoyTgJ1-PpFG4dljeXodqRX15DG-gBAAAABQ');
-// Output: wib1OPW9EkDeiwUoyTgJ1+PpFG4dljeXodqRX15DG+gBAAAABQ==
-```
-
-With arrays:
-
-```php
-use WebauthnEmulator\Authenticator;
-
-$input = [
-    "id" => "HB_PkyggPmHCHbcYyQCfLXTakdmq3WGCcOBjLQK3WkA", // already base64url-encoded
-    "rawId" => "HB/PkyggPmHCHbcYyQCfLXTakdmq3WGCcOBjLQK3WkA=", // standard base64
-];
-
-// Example of recoding an array of standard base64 strings to base64url
-$base64urlArray = Authenticator::base64Normal2Url($input);
-/* Result:
-[
-  "id" => "HB_PkyggPmHCHbcYyQCfLXTakdmq3WGCcOBjLQK3WkA", // left as is
-  "rawId" => "HB_PkyggPmHCHbcYyQCfLXTakdmq3WGCcOBjLQK3WkA", // recoded to base64url
-]
-*/ 
-
-
-// Example of recoding an array of base64url to standard base64
-$base64Array = Authenticator::base64Url2Normal($input);
-/* Result:
-[
-  "id" => "HB/PkyggPmHCHbcYyQCfLXTakdmq3WGCcOBjLQK3WkA=", // recoded to standard base64
-  "rawId" => "HB/PkyggPmHCHbcYyQCfLXTakdmq3WGCcOBjLQK3WkA=", // left as is
-]
-*/
-```
-
-By using these methods, you can ensure that the data you send and receive from WebAuthn servers is correctly encoded,
-regardless of the server's specific implementation details.
 
 ## More Examples
 

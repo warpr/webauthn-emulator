@@ -1,25 +1,24 @@
 {
-  "name": "warpr/webauthn-emulator",
-  "version": "1.1.0",
-  "type": "library",
-  "description": "PHP library to emulate WebAuthn authenticators like YubiKeys, Touch ID, Face ID, Windows Hello, etc",
-  "require": {
-    "php": "^8.0",
-    "ext-openssl": "*",
-    "spomky-labs/cbor-php": "^3.0"
-  },
-  "autoload": {
-    "psr-4": {
-      "WebauthnEmulator\\": "src",
-      "WebauthnEmulator\\Tests\\": "tests"
+    "name": "warpr/webauthn-emulator",
+    "version": "2.0.0",
+    "type": "library",
+    "description": "PHP library to emulate WebAuthn authenticators like YubiKeys, Touch ID, Face ID, Windows Hello, etc",
+    "require": {
+        "php": "^8.0",
+        "ext-openssl": "*",
+        "spomky-labs/cbor-php": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "WebauthnEmulator\\": "src"
+        }
+    },
+    "license": "MIT",
+    "minimum-stability": "stable",
+    "require-dev": {
+        "guzzlehttp/guzzle": "^7.4"
+    },
+    "scripts": {
+        "post-install-cmd": "git config --local core.hooksPath etc/hooks"
     }
-  },
-  "license": "MIT",
-  "minimum-stability": "stable",
-  "require-dev": {
-    "guzzlehttp/guzzle": "^7.4"
-  },
-  "scripts": {
-    "post-install-cmd": "git config --local core.hooksPath etc/hooks"
-  }
 }

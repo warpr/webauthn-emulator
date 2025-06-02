@@ -11,6 +11,7 @@ use JsonException;
 use WebauthnEmulator\CredentialRepository\RepositoryInterface;
 use WebauthnEmulator\Exceptions\CredentialNotFoundException;
 use WebauthnEmulator\Exceptions\InvalidArgumentException;
+use WebauthnEmulator\text;
 
 class Authenticator implements AuthenticatorInterface
 {
@@ -58,11 +59,11 @@ class Authenticator implements AuthenticatorInterface
         ]);
 
         return [
-            'id' => static::base64Normal2Url($credential->getId()),
+            'id' => $credential->getId(),
             'rawId' => $credential->getId(),
             'response' => [
-                'clientDataJSON' => base64_encode($clientDataJson),
-                'attestationObject' => base64_encode((string) $attestationObject),
+                'clientDataJSON' => text::base64url_encode($clientDataJson),
+                'attestationObject' => text::base64url_encode((string) $attestationObject),
             ],
             'type' => 'public-key',
         ];
@@ -119,12 +120,12 @@ class Authenticator implements AuthenticatorInterface
         $this->repository->save($credential);
 
         return [
-            'id' => static::base64Normal2Url($credential->getId()),
+            'id' => $credential->getId(),
             'rawId' => $credential->getId(),
             'response' => [
-                'authenticatorData' => base64_encode($authenticatorData),
-                'clientDataJSON' => base64_encode($clientDataJson),
-                'signature' => base64_encode($signature),
+                'authenticatorData' => text::base64url_encode($authenticatorData),
+                'clientDataJSON' => text::base64url_encode($clientDataJson),
+                'signature' => text::base64url_encode($signature),
                 'userHandle' => $credential->getUserHandle(),
             ],
             'type' => 'public-key',
@@ -156,7 +157,7 @@ class Authenticator implements AuthenticatorInterface
             foreach ($credentialIds as $credentialId) {
                 try {
                     // ensure that we always use the raw credential id
-                    $rawId = static::base64Url2Normal($credentialId['id']);
+                    $rawId = $credentialId['id'];
                     $credential = $this->repository->getById($rpId, $rawId);
                 } catch (CredentialNotFoundException) {
                     // receive exception if not found, normal case
@@ -186,65 +187,9 @@ class Authenticator implements AuthenticatorInterface
         $authData .= $credential->getPackedSignCount();
         $authData .= $aaGuid;
         $authData .= $credential->getPackedIdLength();
-        $authData .= base64_decode($credential->getId());
+        $authData .= text::base64url_decode($credential->getId());
         $authData .= $credential->getCoseKey();
 
         return $authData;
-    }
-
-    /**
-     * Recode base64 string or array to base64url
-     * Arrays are recoded recursively
-     */
-    public static function base64Normal2Url(string|array $base64Encoded): string|array
-    {
-        if (is_array($base64Encoded)) {
-            return array_map([static::class, 'base64Normal2Url'], $base64Encoded);
-        }
-
-        // if string has chars other than base64, return as is
-        $found = strspn(
-            $base64Encoded,
-            'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/='
-        );
-        if ($found !== strlen($base64Encoded)) {
-            return $base64Encoded;
-        }
-
-        $decoded = base64_decode($base64Encoded, true);
-
-        if ($decoded === false) {
-            return $base64Encoded;
-        }
-
-        return str_replace(['+', '/', '='], ['-', '_', ''], $base64Encoded);
-    }
-
-    /**
-     * Recode base64url or trimmed base64 string or array to non-trimmed base64
-     * Arrays are recoded recursively
-     */
-    public static function base64Url2Normal(string|array $base64urlEncoded): string|array
-    {
-        if (is_array($base64urlEncoded)) {
-            return array_map([static::class, 'base64Url2Normal'], $base64urlEncoded);
-        }
-
-        // if string has chars other than base64url, return as is
-        $found = strspn(
-            $base64urlEncoded,
-            'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_'
-        );
-        if ($found !== strlen($base64urlEncoded)) {
-            return $base64urlEncoded;
-        }
-
-        $decoded = base64_decode(str_replace(['-', '_'], ['+', '/'], $base64urlEncoded), true);
-
-        if ($decoded === false) {
-            return $base64urlEncoded;
-        }
-
-        return base64_encode($decoded);
     }
 }

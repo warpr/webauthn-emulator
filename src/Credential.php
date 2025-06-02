@@ -10,6 +10,7 @@ use CBOR\UnsignedIntegerObject;
 use JetBrains\PhpStorm\ArrayShape;
 use OpenSSLAsymmetricKey;
 use WebauthnEmulator\Exceptions\InvalidArgumentException;
+use WebauthnEmulator\text;
 
 class Credential implements CredentialInterface
 {
@@ -82,7 +83,7 @@ class Credential implements CredentialInterface
 
     public function getPackedIdLength(): string
     {
-        return pack('n', strlen(base64_decode($this->id)));
+        return pack('n', strlen(text::base64url_decode($this->id)));
     }
 
     public function getId(): string

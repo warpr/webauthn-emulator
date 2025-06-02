@@ -3,6 +3,7 @@
 namespace WebauthnEmulator;
 
 use WebauthnEmulator\Exceptions\InvalidArgumentException;
+use WebauthnEmulator\text;
 
 class CredentialFactory
 {
@@ -26,7 +27,7 @@ class CredentialFactory
         }
 
         return new Credential(
-            id: base64_encode(string: openssl_random_pseudo_bytes(32)),
+            id: text::base64url_encode(string: openssl_random_pseudo_bytes(32)),
             privateKey: openssl_pkey_new([
                 'private_key_type' => OPENSSL_KEYTYPE_EC,
                 'curve_name' => 'prime256v1',

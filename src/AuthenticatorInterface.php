@@ -13,7 +13,4 @@ interface AuthenticatorInterface
         string|array|null $credentialIds,
         string $challenge
     ): array;
-
-    public static function base64Normal2Url(string|array $base64Encoded): string|array;
-    public static function base64Url2Normal(string|array $base64urlEncoded): string|array;
 }
